@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Dashboard from "./pages/dashboard/Dashboard";
 import UserRoutes from "./protected_routes/UserRoutes";
 import ProductAdd from "./pages/product_add/ProductAdd";
-
+import ResetPassword from "./pages/login/ResetPassword";
 
 function App() {
   return (
@@ -19,9 +19,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/password/reset/:token" element={<ResetPassword/>} />
         <Route element={<UserRoutes />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/productAdd" element={<ProductAdd/>} />
+       
         </Route>
         <Route path="*" element={<h1>404 Page Not Found</h1>}/>
 

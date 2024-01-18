@@ -5,6 +5,7 @@ import Sec from "../../assets/images/Sec.png";
 import { loginApi } from "../../Apis/Api";
 import { toast } from "react-toastify";
 import {Link, useNavigate} from "react-router-dom";
+import ForgetPassword from "../component/ForgetPassword";
 
 
 const Login = () => {
@@ -75,7 +76,7 @@ const Login = () => {
               className="block w-full rounded-md border-0 py-1.5 pl-5 pr-5 mb-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
             />
             <button onClick={handelSubmit} className="bg-sky-400 w-full rounded-md border-0 py-1.5 pl-5 pr-5 mb-2  hover:bg-sky-600 text-white ">Login</button>
-            <h2 className="text-right text-sky-500 hover:text-sky-400">Forget Password ?</h2>
+            <ForgetPassword/>
             <h2 className="pt-4">Don’t have an account? <Link to="/register" className="text-sky-500 hover:text-sky-400">Sign Up</Link></h2>
 
           </div>

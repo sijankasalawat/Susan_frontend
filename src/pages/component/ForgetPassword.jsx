@@ -1,9 +1,12 @@
 import { Fragment, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { ExclamationTriangleIcon, UserIcon } from '@heroicons/react/24/outline'
+import { toast } from 'react-toastify';
+import { forgotPasswordApi } from '../../Apis/Api';
 
 export default function ForgetPassword() {
   const [open, setOpen] = useState(false)
+  const [email, setEmail] = useState("");
 
   const cancelButtonRef = useRef(null)
   const handleForgotClick = () => {
@@ -11,7 +14,29 @@ export default function ForgetPassword() {
     setOpen(true);
   };
 
-
+  const handleEmail = (e) => {
+    setEmail(e.target.value);
+  };
+  const forgotPassword = (e) => {
+    e.preventDefault();
+    const data = {
+      email: email,
+    };
+    // Rename the inner function to something else
+    forgotPasswordApi(data)
+      .then((res) => {
+        if (res.data.success == true) {
+          toast.success(res.data.message);
+        } else {
+          toast.error(res.data.message);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error(err.response?.data?.message || "Internal server error");
+      });
+  };
+  
   return (
     <>
 
@@ -58,7 +83,7 @@ export default function ForgetPassword() {
                        
                      
                         <input 
-              placeholder="enter you email" type="text" className="block w-full rounded-md border-0 py-1.5 pl-5 pr-5 mb-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6" />
+              placeholder="enter you email"  onChange={handleEmail} type="text" className="block w-full rounded-md border-0 py-1.5 pl-5 pr-5 mb-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6" />
                       </div>
                     </div>
                   </div>
@@ -68,7 +93,7 @@ export default function ForgetPassword() {
                   <button
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-green-400 px-3 py-2 text-sm font-semibold text-white shadow-sm   hover:bg-green-500 sm:mt-0 sm:w-auto"
-                    onClick={() => setOpen(false)}
+                    onClick={forgotPassword}
                     ref={cancelButtonRef}
                   >
                    Change Password
