@@ -17,15 +17,28 @@ const ProductAdd = () => {
   const [time, setTime] = useState(null);
   const [productImage, setProductImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-
   const [products, setProducts] = useState([]);
-  // load all products when page loads
-  useEffect(()=>{
-   getProductsByUserIdApi().then((res)=>{
-      setProducts(res.data.products)
-    })
+  const userId = JSON.parse(localStorage.getItem("user"))._id;
 
-  },[]);
+  // load all products when page loads
+  useEffect(() => {
+    getProductsByUserIdApi(userId)
+      .then((res) => {
+        // Handle the response from the server
+        if (res.data && res.data.success === false) {
+          toast.error(res.data.message);
+        } else if (res.data && res.data.success === true) {
+          setProducts(res.data.products);
+        } else {
+          toast.error("Unknown response format from the server");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Internal server error");
+      });
+  }, []);
+  
   const handleImage = (event) => {
     const file = event.target.files[0];
     setProductImage(file);
@@ -67,10 +80,13 @@ const ProductAdd = () => {
     try {
       // Call the API to delete the product
       const response = await deleteProductApi(productId);
-
+  
       // Check if the delete operation was successful
       if (response.success) {
         // Update your state or perform any other necessary actions
+        setProducts((prevProducts) =>
+          prevProducts.filter((product) => product._id !== productId)
+        );
         console.log('Product deleted successfully:', response.deletedProduct);
       } else {
         // Handle error, display a message, etc.
@@ -80,6 +96,7 @@ const ProductAdd = () => {
       console.error('Error deleting product:', error);
     }
   };
+  
 
   const [open, setOpen] = useState(false);
 
@@ -441,7 +458,7 @@ const ProductAdd = () => {
                   <button
                     type="button"
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                    onClick={handleDelete}
+                    onClick={() => handleDelete(product._id)}
                     
                   >
                    delete
