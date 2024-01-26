@@ -3,8 +3,8 @@ import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import React, { useEffect } from "react";
 import plus from "../../assets/icons/basil_add-solid.png";
-
-import { createProductApi, getProductApi } from "../../Apis/Api.js";
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { createProductApi,deleteProductApi,getProductsByUserIdApi } from "../../Apis/Api.js";
 import { toast } from "react-toastify";
 
 const ProductAdd = () => {
@@ -20,12 +20,12 @@ const ProductAdd = () => {
 
   const [products, setProducts] = useState([]);
   // load all products when page loads
-  // useEffect(()=>{
-  //   getProductApi().then((res)=>{
-  //     setProducts(res.data.products)
-  //   })
+  useEffect(()=>{
+   getProductsByUserIdApi().then((res)=>{
+      setProducts(res.data.products)
+    })
 
-  // })
+  },[]);
   const handleImage = (event) => {
     const file = event.target.files[0];
     setProductImage(file);
@@ -63,15 +63,37 @@ const ProductAdd = () => {
         toast.error("Internal server error");
       });
   };
+  const handleDelete = async (productId) => {
+    try {
+      // Call the API to delete the product
+      const response = await deleteProductApi(productId);
+
+      // Check if the delete operation was successful
+      if (response.success) {
+        // Update your state or perform any other necessary actions
+        console.log('Product deleted successfully:', response.deletedProduct);
+      } else {
+        // Handle error, display a message, etc.
+        console.error('Failed to delete product:', response.message);
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
 
   const [open, setOpen] = useState(false);
 
   const cancelButtonRef = useRef(null);
+  const [opendelete, setOpendelete] = useState(false);
 
   const handleSellBtnClick = () => {
     console.log("Sell button clicked!");
     setOpen(true);
   };
+  const handelDeleteBtn =()=>{
+    console.log("delete button clicked!");
+    setOpendelete(true);
+  }
 
   return (
     <div className="bg-gray-100">
@@ -330,10 +352,10 @@ const ProductAdd = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2">
           {products.map((product) => {
             return (
-              <div className="m-1">
-                <div class="max-w-sm rounded overflow-hidden shadow-lg">
+              <div className="m-1 mx-2 mt-3">
+                <div class="max-w-sm rounded overflow-hidden shadow-lg h-full">
                   <img
-                    class="w-full h-50"
+                    class="w-full h-[200px] object-fill  hover:scale-110"
                     src={product.productImage}
                     alt="product"
                   />
@@ -351,9 +373,6 @@ const ProductAdd = () => {
                       {product.price}
                     </span>
                     <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                      {product.time}
-                    </span>
-                    <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
                       {product.address}
                     </span>
                     <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
@@ -367,12 +386,74 @@ const ProductAdd = () => {
                     >
                       Edit
                     </button>
-                    <button
+                    <button  onClick={handelDeleteBtn}
                       type="button"
                       className="inline-flex w-full justify-center rounded-md gap-2 align-center bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400 sm:ml-3 sm:w-auto"
                     >
-                      Delete
+                     delete
                     </button>
+
+        <Transition.Root show={opendelete} as={Fragment}>
+      <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={() => setOpendelete(false)}>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0  bg-gray-400 bg-opacity-75 transition-opacity" />
+        </Transition.Child>
+
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              enterTo="opacity-100 translate-y-0 sm:scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            >
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                  <div className="sm:flex sm:items-start">
+                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                      <ExclamationTriangleIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
+                    </div>
+                    <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                      <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                      Delete Product
+                      </Dialog.Title>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500">
+                          Are you sure you want to delete your product
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+              
+                  <button
+                    type="button"
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    onClick={handleDelete}
+                    
+                  >
+                   delete
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition.Root>
+                   
                   </div>
                 </div>
               </div>

@@ -52,10 +52,12 @@ const Dashboard = () => {
               View All
             </a>
           </div>
-          <h1>hello</h1>
-          <h1>hello</h1>
-          <h1>hello</h1>
-          <h1>hello</h1>
+        <div className="grid-cols-2 lg:grid-cols-5 md:grid-col-3 ">
+          <div className="">
+            
+          </div>
+
+        </div>
           <hr />
         </div>
       </div>
